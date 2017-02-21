@@ -9,11 +9,15 @@
 ;  BIP's Operating System!
 ;  Copyright (C) 2013 Universidade do Vale do Itajai
 ;
+;  # Laboratory of Embedded and Distributed Systems
+;  # Computer Networks Laboratory
+;
 ;  Contributors:
 ;  Hendrig Wernner Maus Santana Gonçalves
 ;  Fabricio Bortoluzzi
 ;  Cesar Albenes Zeferino
 ;
+
 
 .data
   # Constantes
@@ -27,6 +31,8 @@
   lst_indr_value  : .word 0x000       # Endereço para armazenar o último valor do Indr
   lst_status_value: .word 0x000       # Endereço para armazenar o último valor do Status
   lst_pc_value    : .word 0x000       # Endereço para armazenar o último valor do PC
+
+
 .text
 #===============================================================================
 # Trecho de interrupção
@@ -78,10 +84,6 @@ INTERRUPT_RETURN:          # Rotina de retorno de interrupção
   STO $arg1                # Carrega o Id da tarefa atual
   JMP OS_TSK_RETURN        # Retorna a tarefa
 	  
-#===============================================================================
-# Fim do trecho de interrupção
-#===============================================================================
-	
 #===============================================================================
 #   Utils
 # Funções úteis para o sistema
