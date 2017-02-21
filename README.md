@@ -1,2 +1,2 @@
 # bipos
-BIP/OS is BIP's Operating System.
+BIP/OS is an operating system for the educational BIP Processor.
