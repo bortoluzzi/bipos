@@ -1,78 +1,90 @@
-#
-# BIP/OS
-# Author: Hendrig Wernner M. S. GonÁalves
-#
+;   _     _            __            
+;  | |__ (_)_ __      / /   ___  ___ 
+;  | '_ \| | '_ \    / /   / _ \/ __|
+;  | |_) | | |_) |  / /   | (_) \__ \
+;  |_.__/|_| .__/  /_/     \___/|___/
+;          |_|                       
+;  
+;  
+;  BIP's Operating System!
+;  Copyright (C) 2013 Universidade do Vale do Itajai
+;
+;  Contributors:
+;  Hendrig Wernner Maus Santana Gon√ßalves
+;  Fabricio Bortoluzzi
+;  Cesar Albenes Zeferino
+;
 
 .data
   # Constantes
   prx_tsk_id      : .word 0x000       # Proximo id de tarefa
   tsk_quantity    : .word 0x000       # Quantidade de tarefas
-  next_tsk        : .word 0x000       # PrÛxima tarefa
+  next_tsk        : .word 0x000       # Pr√≥xima tarefa
   get_next_tsk    : .word 0x000       
-  next_tsk_ind    : .word 0x000       # Õndice da prÛxima tarefa
+  next_tsk_ind    : .word 0x000       # √çndice da pr√≥xima tarefa
   current_tsk_ind : .word 0x000       # Tarefa atual
-  lst_acc_value   : .word 0x000       # EndereÁo para armazenar o ˙ltimo valor do acumulador
-  lst_indr_value  : .word 0x000       # EndereÁo para armazenar o ˙ltimo valor do Indr
-  lst_status_value: .word 0x000       # EndereÁo para armazenar o ˙ltimo valor do Status
-  lst_pc_value    : .word 0x000       # EndereÁo para armazenar o ˙ltimo valor do PC
+  lst_acc_value   : .word 0x000       # Endere√ßo para armazenar o √∫ltimo valor do acumulador
+  lst_indr_value  : .word 0x000       # Endere√ßo para armazenar o √∫ltimo valor do Indr
+  lst_status_value: .word 0x000       # Endere√ßo para armazenar o √∫ltimo valor do Status
+  lst_pc_value    : .word 0x000       # Endere√ßo para armazenar o √∫ltimo valor do PC
 .text
 #===============================================================================
-# Trecho de interrupÁ„o
-# Este È o ponto para onde s„o desviadas as interrupÁıes do sistema.
+# Trecho de interrup√ß√£o
+# Este √© o ponto para onde s√£o desviadas as interrup√ß√µes do sistema.
 #===============================================================================
 	
   # Carrega os valores dos registradores para salvamento de contexto
-  STO $tmp0                # $tmp0 È um endereÁo especÌfico
+  STO $tmp0                # $tmp0 √© um endere√ßo espec√≠fico
   STO $tmp0
   LD $indr                 #
-  STO $tmp1                # $tmp1 È um endereÁo especÌfico
+  STO $tmp1                # $tmp1 √© um endere√ßo espec√≠fico
   LD $status               #
-  STO $tmp2                # $tmp2 È um endereÁo especÌfico
+  STO $tmp2                # $tmp2 √© um endere√ßo espec√≠fico
 	
   LD $int_status           # Carrega o registrador $int_status
-  ANDI 0x0003              # Caso o valor seja 0, n„o ocorreu interrupÁ„o, ent„o...
+  ANDI 0x0003              # Caso o valor seja 0, n√£o ocorreu interrup√ß√£o, ent√£o...
   BEQ MAIN                 # Pula para MAIN
-  LD lst_acc_value         # Carrega o endereÁo onde ser· armazenado o ˙ltimo
-  STO $indr                # valor do registrador ACC antes da interrupÁ„o
+  LD lst_acc_value         # Carrega o endere√ßo onde ser√° armazenado o √∫ltimo
+  STO $indr                # valor do registrador ACC antes da interrup√ß√£o
   LD $tmp0                 #
-  STOV 0x0000              # O registrador $zero È o endereÁo 0x000
+  STOV 0x0000              # O registrador $zero √© o endere√ßo 0x000
   
-  LD lst_indr_value        # Carrega o endereÁo onde ser· armazenado o ˙ltimo
-  STO $indr                # valor do registrador Indr antes da interrupÁ„o
+  LD lst_indr_value        # Carrega o endere√ßo onde ser√° armazenado o √∫ltimo
+  STO $indr                # valor do registrador Indr antes da interrup√ß√£o
   LD $tmp1                 #
   STOV 0x0000              #
   
-  LD lst_status_value      # Carrega o endereÁo onde ser· armazenado o ˙ltimo
-  STO $indr                # valor do registrador Status antes da interrupÁ„o
+  LD lst_status_value      # Carrega o endere√ßo onde ser√° armazenado o √∫ltimo
+  STO $indr                # valor do registrador Status antes da interrup√ß√£o
   LD $tmp0                 #
   STOV 0x0000              #
   
-  POP                      # Se foi iniciada pelo relÛgio, desempilha o topo da pilha
-  STO $tmp0                # E salva o valor do mesmo no endereÁo especificado
-  LD lst_pc_value          # Carrega o endereÁo onde ser· armazenado o ˙ltimo
-  STO $indr                # valor do registrador PC antes da interrupÁ„o
+  POP                      # Se foi iniciada pelo rel√≥gio, desempilha o topo da pilha
+  STO $tmp0                # E salva o valor do mesmo no endere√ßo especificado
+  LD lst_pc_value          # Carrega o endere√ßo onde ser√° armazenado o √∫ltimo
+  STO $indr                # valor do registrador PC antes da interrup√ß√£o
   LD $tmp0                 # 
   STOV 0x0000              #
   
-  LD $int_status           # Verificar se a interrupÁ„o foi gerada por relÛgio ou externamente
+  LD $int_status           # Verificar se a interrup√ß√£o foi gerada por rel√≥gio ou externamente
   ANDI 0x002               #
-  BNE _INTERRUPT_          # Se foi gerada externamente, vai para o trecho de interrupÁ„o
+  BNE _INTERRUPT_          # Se foi gerada externamente, vai para o trecho de interrup√ß√£o
 
   JMP SCHEDULER            # Vai para o SCHEDULER
   
-INTERRUPT_RETURN:          # Rotina de retorno de interrupÁ„o
-  LD current_tsk_ind       # Carrega o Ìndice da tarefa atual
+INTERRUPT_RETURN:          # Rotina de retorno de interrup√ß√£o
+  LD current_tsk_ind       # Carrega o √≠ndice da tarefa atual
   ANDI 0x0007              #
   STO $arg1                # Carrega o Id da tarefa atual
   JMP OS_TSK_RETURN        # Retorna a tarefa
 	  
 #===============================================================================
-# Fim do trecho de interrupÁ„o
+# Fim do trecho de interrup√ß√£o
 #===============================================================================
 	
 #===============================================================================
 #   Utils
-# FunÁıes ˙teis para o sistema
+# Fun√ß√µes √∫teis para o sistema
 #===============================================================================
 
 #===============================================================================
@@ -82,39 +94,39 @@ INTERRUPT_RETURN:          # Rotina de retorno de interrupÁ„o
 # $arg0 = Valor do registrador status
 #===============================================================================
 SET_STATUS:
-  LD $arg0               # Carrega o argumento 0, que contÈm o Status
+  LD $arg0               # Carrega o argumento 0, que cont√©m o Status
   SUBI 0x6               #  
-  BNE CN_NOT_SET         # Os flags C e N est„o setados?
-  LDI 0xFFE              # ForÁa o set nos flags C e N
+  BNE CN_NOT_SET         # Os flags C e N est√£o setados?
+  LDI 0xFFE              # For√ßa o set nos flags C e N
   SUBI 0xFFF             #
   RETURN                 # Retorna
 CN_NOT_SET:              #
   LD $arg0               # 
   SUBI 0x5               # 
-  BNE CZ_NOT_SET         # Os flags C e Z est„o setados?
+  BNE CZ_NOT_SET         # Os flags C e Z est√£o setados?
   LDI 0x1                #
-  ADDI 0xFFF             # ForÁa o set nos flags C e Z
+  ADDI 0xFFF             # For√ßa o set nos flags C e Z
   RETURN                 # Retorna
 CZ_NOT_SET:              #
   LD $arg0               #
   SUBI 0x4               #
-  BNE C_NOT_SET          # O flag C est· setado ?
+  BNE C_NOT_SET          # O flag C est√° setado ?
   LDI 0x2                #
-  ADDI 0xFFF             # ForÁa um set no flag C
+  ADDI 0xFFF             # For√ßa um set no flag C
   RETURN                 # Retorna
 C_NOT_SET:               #
   LD $arg0               #
   SUBI 0x2               #
-  BNE N_NOT_SET          # O Flag N est· setado?
+  BNE N_NOT_SET          # O Flag N est√° setado?
   LDI 0xFFA              #
-  SUBI 0x2               # ForÁa um set no Flag N
+  SUBI 0x2               # For√ßa um set no Flag N
   RETURN                 # Retorna
 N_NOT_SET:               #
   LD $arg0               #
   SUBI 0x1               # 
-  BNE Z_NOT_SET          # O Flag Z est· setado?
+  BNE Z_NOT_SET          # O Flag Z est√° setado?
   LDI 0x1                # 
-  ANDI 0x0               # ForÁa um set no flag Z
+  ANDI 0x0               # For√ßa um set no flag Z
   RETURN                 # Retorna
 Z_NOT_SET:               #
   LDI 0x3                #
@@ -189,7 +201,7 @@ END_FOR_CMD:             #
   RETURN                 # 	
 
 #===============================================================================
-#    FunÁıes de Escrita
+#    Fun√ß√µes de Escrita
 #===============================================================================
 OS_WRITE_PORT0:
   LDI 0xFFE                 # Gera um bloqueio para escrita
@@ -223,58 +235,58 @@ OS_WRITE_PORT1:
 # API
 #===============================================================================
 
-# O BIP/OS possui as seguintes funÁıes em sua API
+# O BIP/OS possui as seguintes fun√ß√µes em sua API
 # 
-# = CriaÁ„o de tarefa       (OS_TSK_CREATE)
-# = InicializaÁ„o de tarefa (OS_TSK_START)
+# = Cria√ß√£o de tarefa       (OS_TSK_CREATE)
+# = Inicializa√ß√£o de tarefa (OS_TSK_START)
 # = Pausa de tarefa         (OS_TSK_PAUSE)
 # = Retorno de tarefa       (OS_TSK_RETURN)
 # = Encerramento de tarefa  (OS_TSK_END)
-# = RemoÁ„o de tarefa       (OS_TSK_REMOVE)
+# = Remo√ß√£o de tarefa       (OS_TSK_REMOVE)
 
 #===============================================================================
 # OS_TSK_CREATE
 #
 # Cria a tarefa na estrutura de dados mantida pelo sistema operacional
 # Argumentos:
-# $arg1 = EndereÁo inicial da tarefa
-# $arg2 = EndereÁo final da tarefa
+# $arg1 = Endere√ßo inicial da tarefa
+# $arg2 = Endere√ßo final da tarefa
 # $arg3 = Prioridade da tarefa
 #===============================================================================
 OS_TSK_CREATE:                  
   
-  LD prx_tsk_id             # Carrega o prÛximo endereÁo 
+  LD prx_tsk_id             # Carrega o pr√≥ximo endere√ßo 
   SLL 0x4                   # Desloca o valor logicamente para a esquerda 4 vezes
-  ADDI 0x700                # Soma o resultado com o endereÁo 0x700, dando o endereÁo onde ficar„o os
+  ADDI 0x700                # Soma o resultado com o endere√ßo 0x700, dando o endere√ßo onde ficar√£o os
   STO $indr                 # argumentos da tarefa. Salva esse resultado em $indr
   
-  LD $arg1                  # Carrega o primeiro argumento da tarefa, inÌcio da tarefa
-  STOV 0x0000               # Armazena o valor em 0x7X0, onde X È o id da tarefa
+  LD $arg1                  # Carrega o primeiro argumento da tarefa, in√≠cio da tarefa
+  STOV 0x0000               # Armazena o valor em 0x7X0, onde X √© o id da tarefa
   
-  LD $indr                  # Carrega o valor da vari·vel indr
-  ADDI 1                    # Atualiza tmp0 para conter o prÛximo endereÁo de tarefa
+  LD $indr                  # Carrega o valor da vari√°vel indr
+  ADDI 1                    # Atualiza tmp0 para conter o pr√≥ximo endere√ßo de tarefa
   STO $indr                 #
   LD $arg2                  # Carrega o segundo argumento da tarefa, fim da tarefa
-  STOV 0x0000               # Armazena o valor em 0x7X1, onde X È o id da tarefa
+  STOV 0x0000               # Armazena o valor em 0x7X1, onde X √© o id da tarefa
 	
   LD $indr                  #
-  ADDI 1                    # Atualiza tmp0 para conter o prÛximo endereÁo de tarefa
+  ADDI 1                    # Atualiza tmp0 para conter o pr√≥ximo endere√ßo de tarefa
   STO $indr                 #
   LD $arg3                  # Carrega o terceiro argumento (prioridade da tarefa)
-  STOV 0x0000	             # Salva na estrutura a prioridade da tarefa no endereÁo 0x7X2
+  STOV 0x0000	             # Salva na estrutura a prioridade da tarefa no endere√ßo 0x7X2
 	
   LD $indr                  #
-  ADDI 0x0001               # Atualiza $indr para conter o prÛximo endereÁo de tarefa
+  ADDI 0x0001               # Atualiza $indr para conter o pr√≥ximo endere√ßo de tarefa
   STO $indr                 #
-  LD $arg1                  # Carrega o primeiro argumento (inÌcio da tarefa)
-  STOV 0x0000               # Salva no endereÁo 0x7X3, que contÈm o pc da tarefa
+  LD $arg1                  # Carrega o primeiro argumento (in√≠cio da tarefa)
+  STOV 0x0000               # Salva no endere√ßo 0x7X3, que cont√©m o pc da tarefa
   
   LD prx_tsk_id             #
   SLL 0x0004                #
-  ADDI 0x070C               # Define $tmp0 como 0x7XC, ˙ltimo endereÁo na tabela
+  ADDI 0x070C               # Define $tmp0 como 0x7XC, √∫ltimo endere√ßo na tabela
   STO $tmp0                 # de contexto da tarefa
   
-LOOP_FILL_ZERO:             # Preenche com zero os demais endereÁos
+LOOP_FILL_ZERO:             # Preenche com zero os demais endere√ßos
   LD $indr                  # Carrega o registrador $indr
   ADDI 0x0001               # Adiciona mais 1
   STO $indr                 # $indr = $indr + 1
@@ -285,18 +297,18 @@ LOOP_FILL_ZERO:             # Preenche com zero os demais endereÁos
   BNE LOOP_FILL_ZERO        #
 
   LD tsk_quantity           #
-  STO $indr                 # Define o valor como Ìndice do vetor
+  STO $indr                 # Define o valor como √≠ndice do vetor
   LD $arg3                  # Carrega a prioridade da tarefa
   SLL 0x0004                # Desloca 4 bits para a esquerda
   ADD prx_tsk_id            # Adiciona com o Id da tarefa 
-  STO $tmp0                 # $tmp0 = 0x0PI, onde P È a prioridade e I È o Id
+  STO $tmp0                 # $tmp0 = 0x0PI, onde P √© a prioridade e I √© o Id
   LD $tmp0                  # Carrega o valor da prioridade
   STOV 0x5B0                # Salva o valor na tabela de processos
   LD tsk_quantity           # Carrega a quantidade de tarefas
   ADDI 0x1                  # Soma mais 1
   STO tsk_quantity          #
   
-  LD prx_tsk_id             # Carrega o prÛximo Id
+  LD prx_tsk_id             # Carrega o pr√≥ximo Id
   ADDI 0x0001               # Soma mais 1
   STO prx_tsk_id            # Salva o valor
 
@@ -308,8 +320,8 @@ LOOP_FILL_ZERO:             # Preenche com zero os demais endereÁos
 # OS_TSK_START (UNUSED)
 #
 # Inicia a tarefa
-# Essa funÁ„o n„o È chamada por uma instruÁ„o CALL, mas sim por uma instruÁ„o 
-# JMP. Ou seja, ela n„o guarda valores na pilha
+# Essa fun√ß√£o n√£o √© chamada por uma instru√ß√£o CALL, mas sim por uma instru√ß√£o 
+# JMP. Ou seja, ela n√£o guarda valores na pilha
 #
 # Argumentos: 
 # $arg1 = Id da tarefa a ser iniciada
@@ -319,10 +331,10 @@ OS_TSK_START:
   LD $arg1                 #
   SLL 0x4                  #
   ADDI 0x702               #
-  STO $indr                # EndereÁo da prioridade da tarefa (0x7X2)
+  STO $indr                # Endere√ßo da prioridade da tarefa (0x7X2)
   LDV 0x0000               # Carrega a prioridade da tarefa
   
-  SLL 0x4                  # Desloca 4 bits ‡ esquerda
+  SLL 0x4                  # Desloca 4 bits √† esquerda
   ADD $arg1                # Soma com o Id da tarefa
   STO $tmp0                #
   
@@ -333,12 +345,12 @@ OS_TSK_START:
   STO $indr                #
   
   ADDI 0x6                 # Carrega 0x6
-  STO $indr                # Armazena em $indr o endereÁo do status da tarefa (0x7X6)
-  LDI 2                    # Carrega o valor 2 (Status 2 = Em execuÁ„o)
+  STO $indr                # Armazena em $indr o endere√ßo do status da tarefa (0x7X6)
+  LDI 2                    # Carrega o valor 2 (Status 2 = Em execu√ß√£o)
   STOV 0x0000              # Salva na estrutura ( MEM[0+0x7X6] = 2)
   
-  LD $indr                 # Carrega o endereÁo do status da tarefa (0x7X6)
-  SUBI 0x3                 # Subtrai para o endereÁo do PC da tarefa (0x7X3)
+  LD $indr                 # Carrega o endere√ßo do status da tarefa (0x7X6)
+  SUBI 0x3                 # Subtrai para o endere√ßo do PC da tarefa (0x7X3)
   STO $indr                # Armazena o valor no registrador $indr
   LDV 0x0000               # Carrega MEM[0+0x7X3]
   STO $tmp1              
@@ -348,128 +360,128 @@ OS_TSK_START:
 #===============================================================================
 # OS_TSK_PAUSE
 #
-# Pausa a tarefa em execuÁ„o, salvando o contexto da mesma
+# Pausa a tarefa em execu√ß√£o, salvando o contexto da mesma
 # 
 # Argumentos: 
 # $arg1 = Id da tarefa
 #===============================================================================
 OS_TSK_PAUSE:
   
-  LD lst_pc_value          # Carrega o ˙ltimo pc em andamento
-  STO $indr                # Carrega o endereÁo de armazenamento do valor do 
+  LD lst_pc_value          # Carrega o √∫ltimo pc em andamento
+  STO $indr                # Carrega o endere√ßo de armazenamento do valor do 
   LDV 0x0000               # pc da tarefa
-  STO $tmp0                # $tmp0 = ⁄ltimo PC da tarefa
+  STO $tmp0                # $tmp0 = √öltimo PC da tarefa
   LD $arg1                 # 
   SLL 0x4                  #
   ADDI 0x703               #
-  STO $indr                # EndereÁo base dos argumentos da tarefa
+  STO $indr                # Endere√ßo base dos argumentos da tarefa
   STO $tmp1                #
   LD $tmp0                 #
-  STOV 0x0000              # Salva o PC no endereÁo 0x7X3, sendo X o Id da tarefa
+  STOV 0x0000              # Salva o PC no endere√ßo 0x7X3, sendo X o Id da tarefa
   
-  LD lst_status_value      # Carrega o ˙ltimo valor do registrador status
+  LD lst_status_value      # Carrega o √∫ltimo valor do registrador status
   STO $indr                # 
   LDV 0x0000               #
   STO $tmp0                # $tmp0 = last status value
   LD $tmp1                 #
   ADDI 0x0001              #
   STO $tmp1                #
-  STO $indr                # Carrega o endereÁo de armazenamento do valor do registrador status
+  STO $indr                # Carrega o endere√ßo de armazenamento do valor do registrador status
   LD $tmp0                 #
-  STOV 0x0000              # Armazena o valor do acumulador no endereÁo 0x7X4
+  STOV 0x0000              # Armazena o valor do acumulador no endere√ßo 0x7X4
   
   LD $indr                 # 
   ADDI 0x1                 #
   STO $tmp1                #
-  LD lst_acc_value         # Carrega o ˙ltimo valor do acumulador da tarefa
-  STO $indr                # Carrega o endereÁo de armazenamento do valor do acumulador
+  LD lst_acc_value         # Carrega o √∫ltimo valor do acumulador da tarefa
+  STO $indr                # Carrega o endere√ßo de armazenamento do valor do acumulador
   LDV 0x0000               #
   STO $tmp0                #
   LD $tmp1                 #
   STO $indr                #
   LD $tmp0                 #
-  STOV 0x0000              # Armazena o valor do acumulador no endereÁo 0x7X5
+  STOV 0x0000              # Armazena o valor do acumulador no endere√ßo 0x7X5
   
   LD $indr                 #
   ADDI 0x1                 #
-  STO $indr                # Carrega o endereÁo de armazenamento do valor do status da tarefa
+  STO $indr                # Carrega o endere√ßo de armazenamento do valor do status da tarefa
   STO $tmp1                #
   LDI 0x1                  # Carrega o status da tarefa (1, em espera)
-  STOV 0x0000              # Armazena o status da tarefa no endereÁo 0x7X6
+  STOV 0x0000              # Armazena o status da tarefa no endere√ßo 0x7X6
   
-  LD lst_indr_value        # Carrega o Ìndice do vetor
+  LD lst_indr_value        # Carrega o √≠ndice do vetor
   STO $indr                #
   LDV 0x0000               #
   STO $tmp0                #
   LD $tmp1                 #
   ADDI 0x0001              #
   STO $tmp1                #
-  STO $indr                # Carrega o endereÁo de armazenamento do valor do Ìndice do vetor
+  STO $indr                # Carrega o endere√ßo de armazenamento do valor do √≠ndice do vetor
   LD $tmp0                 #
-  STOV 0x0000              # Armazena o valor do Ìndice do vetor no endereÁo 0x7X7
+  STOV 0x0000              # Armazena o valor do √≠ndice do vetor no endere√ßo 0x7X7
 
   LD $indr                 #
   ADDI 0x1                 #
-  STO $indr                # Carrega o endereÁo de armazenamento do valor da direÁ„o
+  STO $indr                # Carrega o endere√ßo de armazenamento do valor da dire√ß√£o
   LD $port0_dir            # do registrador port0_data
   STOV 0x0000              # Armazena o valor em 0x7X8
 
   LD $indr                 #
   ADDI 0x1                 #
-  STO $indr                # Carrega o endereÁo de armazenamento do valor 
+  STO $indr                # Carrega o endere√ßo de armazenamento do valor 
   LD $port0_data           # contido no registrador port0_data
   STOV 0x0000              # Armazena o valor em 0x7X9
 
   LD $indr                 #
   ADDI 0x1                 #
-  STO $indr                # Carrega o endereÁo de armazenamento do valor da direÁ„o
+  STO $indr                # Carrega o endere√ßo de armazenamento do valor da dire√ß√£o
   LD $port1_dir            # do registrador port1_data
   STOV 0x0000              # Armazena o valor em 0x7XA
 
   LD $indr                 #
   ADDI 0x1                 #
-  STO $indr                # Carrega o endereÁo de armazenamento do valor 
+  STO $indr                # Carrega o endere√ßo de armazenamento do valor 
   LD $port1_data           # contido no registrador port1_data
   STOV 0x0000              # Armazena o valor em 0x7XB
   
-  POP                      # Retira o endereÁo da chamada a esta funÁ„o
+  POP                      # Retira o endere√ßo da chamada a esta fun√ß√£o
   STO $tmp2                #
   
   LD $indr                 #
   ADDI 0x1                 #
-  STO $indr                # Carrega o endereÁo do registrador $stkptr
+  STO $indr                # Carrega o endere√ßo do registrador $stkptr
   LD $stkptr               # 
   STOV 0x0000              # Armazena o valor em 0x7XC
 
   LD $arg1                 # Carrega o id da tarefa
-  SLL 0x3                  # Desloca o endereÁo para a esquerda
-  ADDI 0x680               # Adiciona ao endereÁo base da STACK_CONTEXT_TABLE
+  SLL 0x3                  # Desloca o endere√ßo para a esquerda
+  ADDI 0x680               # Adiciona ao endere√ßo base da STACK_CONTEXT_TABLE
   STO $tmp1                # $tmp1 = base da pilha
   
   LD $stkptr               # Ajusta o valor do registrador STKPTR
-  SUBI 0x0001              # para que o mesmo utilize o mesmo Ìndice que a 
+  SUBI 0x0001              # para que o mesmo utilize o mesmo √≠ndice que a 
   STO $tmp0                # tabela de contexto da pilha
   
   LD $arg1                 #
   SLL 0x0003               #
   ADDI 0x0680              #
-  ADD $tmp0                # Carrega o endereÁo para o topo da pilha
+  ADD $tmp0                # Carrega o endere√ßo para o topo da pilha
   STO $tmp0                #
   STO $indr                #
 
 STACK_CONTEXT_LOOP_POP:           #
   LD $indr                        #
-  SUB $tmp1                       # Desvia se o Ìndice for menor que o valor do 
+  SUB $tmp1                       # Desvia se o √≠ndice for menor que o valor do 
   BLT END_STACK_CONTEXT_LOOP_POP  # registrador STKPTR da tarefa
   POP                             # Loop de salvamento da pilha
-  STOV 0x0000                     # Salva o topo da pilha no endereÁo 0x6Xi
-  LD $indr                        # Carrega o endereÁo 0x6Xi
-  SUBI 0x1                        # Carrega o prÛximo endereÁo (0x6Xi-1)             
+  STOV 0x0000                     # Salva o topo da pilha no endere√ßo 0x6Xi
+  LD $indr                        # Carrega o endere√ßo 0x6Xi
+  SUBI 0x1                        # Carrega o pr√≥ximo endere√ßo (0x6Xi-1)             
   STO $indr                       # Salva o mesmo
   JMP STACK_CONTEXT_LOOP_POP      # Volta para o loop e continua desempilhando   
 END_STACK_CONTEXT_LOOP_POP:       #
 
-  LD $tmp2                   # Carrega o endereÁo da funÁ„o que chamou
+  LD $tmp2                   # Carrega o endere√ßo da fun√ß√£o que chamou
   PUSH                       # Retorna para a pilha
 
   RETURN                     #
@@ -486,7 +498,7 @@ OS_TSK_RETURN:
     
   LD $arg1                 #
   SLL 0x4                  #
-  ADDI 0x70C               # Carrega o endereÁo onde foi armazenado o valor do
+  ADDI 0x70C               # Carrega o endere√ßo onde foi armazenado o valor do
   STO $indr                # registrador $stkptr
   LDV 0x0000               #
   STO $tmp0                # Salva o mesmo em $tmp0
@@ -494,96 +506,96 @@ OS_TSK_RETURN:
   LD $arg1                 #
   SLL 0x3                  #
   ADDI 0x680               # 
-  STO $tmp1                # Carrega o endereÁo da base da pilha (0x6X0)
+  STO $tmp1                # Carrega o endere√ßo da base da pilha (0x6X0)
 
   LD $tmp0                         #
   SUBI 0x0000                      # Verifica se existiam itens na pilha
   BEQ END_STACK_CONTEXT_LOOP_PUSH  #
   
   LD $tmp0                         # Carrega o valor do Stack Pointer, que
-  SUBI 0x0001                      # comeÁa em 1, e 
-  STO $tmp0                        # Ajusta para o Ìndice, que comeÁa em 0
+  SUBI 0x0001                      # come√ßa em 1, e 
+  STO $tmp0                        # Ajusta para o √≠ndice, que come√ßa em 0
 
   LD $tmp1                         #
   ADD $tmp0                        #
-  STO $tmp0                        # Carrega o endereÁo do topo da pilha 
+  STO $tmp0                        # Carrega o endere√ßo do topo da pilha 
   
 STACK_CONTEXT_LOOP_PUSH:           #
-  LD $tmp0                         # Carrega o endereÁo topo
-  SUB $tmp1                        # Carrega o endereÁo base
+  LD $tmp0                         # Carrega o endere√ßo topo
+  SUB $tmp1                        # Carrega o endere√ßo base
   BLT END_STACK_CONTEXT_LOOP_PUSH  #
   LD $tmp0                         # 
   STO $indr                        #
-  LDV 0x0000                       # Carrega o valor contido no endereÁo 0x6Xi
+  LDV 0x0000                       # Carrega o valor contido no endere√ßo 0x6Xi
   PUSH                             # Salva no topo da pilha
-  LD $indr                         # Carrega o valor da vari·vel tmp1 endereÁo 0x6Xi
-  SUBI 0x1                         # Diminui 1 do valor do endereÁo
+  LD $indr                         # Carrega o valor da vari√°vel tmp1 endere√ßo 0x6Xi
+  SUBI 0x1                         # Diminui 1 do valor do endere√ßo
   STO $tmp0                        #
   JMP STACK_CONTEXT_LOOP_PUSH      #
 END_STACK_CONTEXT_LOOP_PUSH:       #
 
   LD $arg1                 #
   SLL 0x4                  # 
-  ADDI 0x70B               # Transforma o mesmo em 0x7XB (EndereÁo do registrador port1_data do contexto da tarefa)
+  ADDI 0x70B               # Transforma o mesmo em 0x7XB (Endere√ßo do registrador port1_data do contexto da tarefa)
   STO $indr                #  
   LDV 0x0000               # Carrega o valor do registrador port1_data do contexto da tarefa
   STO $port1_data          # Joga o valor no local
   
   LD $indr                 # 
-  SUBI 0x1                 # Diminui em 1 o endereÁo (0x7XA = EndereÁo do registrador port1_dir)
+  SUBI 0x1                 # Diminui em 1 o endere√ßo (0x7XA = Endere√ßo do registrador port1_dir)
   STO $indr                #
   LDV 0x0000               #
   STO $port1_dir           # Joga o valor no local
   
   LD $indr                 # 
-  SUBI 0x1                 # Diminui em 1 o endereÁo (0x7X9 = EndereÁo do registrador port0_data)
+  SUBI 0x1                 # Diminui em 1 o endere√ßo (0x7X9 = Endere√ßo do registrador port0_data)
   STO $indr                #
-  LDV 0x0000               # Carrega o valor contido no endereÁo
+  LDV 0x0000               # Carrega o valor contido no endere√ßo
   STO $port0_data          # Joga o valor no local
   
   LD $indr                 # 
-  SUBI 0x1                 # Diminui em 1 o endereÁo (0x7X8 = EndereÁo do registrador port0_dir)
+  SUBI 0x1                 # Diminui em 1 o endere√ßo (0x7X8 = Endere√ßo do registrador port0_dir)
   STO $indr                #
-  LDV 0x0000               # Carrega o valor contido no endereÁo
+  LDV 0x0000               # Carrega o valor contido no endere√ßo
   STO $port0_dir           # Joga o valor no local
   
   LD $arg1                 # Carrega o argumento da tarefa
   SLL 0x0004               #
-  ADDI 0x0706              # Carrega o endereÁo (0x7X6 = EndereÁo do status da tarefa)
+  ADDI 0x0706              # Carrega o endere√ßo (0x7X6 = Endere√ßo do status da tarefa)
   STO $indr                #
   LDI 0x2                  #
-  STOV 0x000               # Salva o status da tarefa como sendo 2 (2 - Em execuÁ„o)
+  STOV 0x000               # Salva o status da tarefa como sendo 2 (2 - Em execu√ß√£o)
 
   LD $indr                 #
-  SUBI 0x0001              # Diminui em 1 o endereÁo (0x7X5 = EndereÁo do registrador acc)
+  SUBI 0x0001              # Diminui em 1 o endere√ßo (0x7X5 = Endere√ßo do registrador acc)
   STO $indr                # 
-  LDV 0x0000               # Carrega o valor contido no endereÁo
-  STO $tmp1                # Salva numa vari·vel tempor·ria
+  LDV 0x0000               # Carrega o valor contido no endere√ßo
+  STO $tmp1                # Salva numa vari√°vel tempor√°ria
   
   LD $indr                 # 
-  SUBI 0x2                 # Diminui em 2 o endereÁo (0x7X3 = EndereÁo do registrador pc)
+  SUBI 0x2                 # Diminui em 2 o endere√ßo (0x7X3 = Endere√ßo do registrador pc)
   STO $indr                #
   LDV 0x0000               #
-  STO $tmp2                # Salva numa vari·vel tempor·ria
+  STO $tmp2                # Salva numa vari√°vel tempor√°ria
   
   LD $indr                 #
-  ADDI 0x4                 # Aumenta o endereÁo em 4 (0x7X7 = EndereÁo do registrador indr)
+  ADDI 0x4                 # Aumenta o endere√ßo em 4 (0x7X7 = Endere√ßo do registrador indr)
   STO $indr                #
-  LDV 0x0000               # Carrega o valor contido no endereÁo
+  LDV 0x0000               # Carrega o valor contido no endere√ßo
   STO $tmp3                # Joga o valor no local
 
   LD $arg1                 # 
-  SLL 0x4                  # Diminui em 1 o endereÁo (0x7X4 = EndereÁo do registrador status)
+  SLL 0x4                  # Diminui em 1 o endere√ßo (0x7X4 = Endere√ßo do registrador status)
   ADDI 0x0704              #
   STO $indr                #
-  LDV 0x0000               # Carrega o valor contido no endereÁo
+  LDV 0x0000               # Carrega o valor contido no endere√ßo
   STO $arg0                # Salva o valor do registrador STATUS em $arg0
   
-  POP                      # Desempilha para n„o prejudicar o contexto da tarefa
-  STO $tmp0                # quando chamar a funÁ„o SET_STATUS
+  POP                      # Desempilha para n√£o prejudicar o contexto da tarefa
+  STO $tmp0                # quando chamar a fun√ß√£o SET_STATUS
   
   LDI 0x001                #
-  OR $int_config           # Prepara para a remoÁ„o do bloqueio
+  OR $int_config           # Prepara para a remo√ß√£o do bloqueio
   STO $tmp4                #
   
   CALL SET_STATUS          # Retorna o estado do registrador status
@@ -591,14 +603,14 @@ END_STACK_CONTEXT_LOOP_PUSH:       #
   LD $tmp0                 #
   PUSH                     # Retorna o topo da pilha
   
-  LD $tmp3                 # Retorna o valor do Ìndice
+  LD $tmp3                 # Retorna o valor do √≠ndice
   STO $indr                #
   
-  LD $tmp4                 # Carrega o valor antigo da configuraÁ„o de 
-  STO $int_config          # interrupÁ„o sem alterar o registrador status
+  LD $tmp4                 # Carrega o valor antigo da configura√ß√£o de 
+  STO $int_config          # interrup√ß√£o sem alterar o registrador status
   
   LD $tmp1                 # Carrega o valor do acumulador
-  JR $tmp2                 # Pula para a ˙ltima linha da tarefa
+  JR $tmp2                 # Pula para a √∫ltima linha da tarefa
   
 #===============================================================================
 # OS_TSK_END
@@ -617,8 +629,8 @@ OS_TSK_END:
   STO $indr                #
   LDV 0x05B0               #
   ANDI 0x0007              #
-  SLL 0x4                  # Desloca em 4 posiÁıes o id da tarefa
-  ADDI 0x706               # Adiciona 0x706, formando o endereÁo do status da tarefa (0x7X6)
+  SLL 0x4                  # Desloca em 4 posi√ß√µes o id da tarefa
+  ADDI 0x706               # Adiciona 0x706, formando o endere√ßo do status da tarefa (0x7X6)
   STO $indr
   
   LDI 0x3                  # Carrega o status 3 = Tarefa encerrada
@@ -629,28 +641,28 @@ OS_TSK_END:
 # =============================================================================
 # OS_TSK_REMOVE
 #
-# Remove uma tarefa. Em TODAS as tarefas a ˙ltima linha deve ser um 
-# JMP para este endereÁo.
+# Remove uma tarefa. Em TODAS as tarefas a √∫ltima linha deve ser um 
+# JMP para este endere√ßo.
 # 
 # =============================================================================	
 OS_TSK_REMOVE:
 	
-  LD current_tsk_ind        # Carrega o Ìndice da tarefa
+  LD current_tsk_ind        # Carrega o √≠ndice da tarefa
   STO $tmp1                 # Armazena em $tmp1
   
-  LD tsk_quantity                # Verifica se o Ìndice È igual a 0
+  LD tsk_quantity                # Verifica se o √≠ndice √© igual a 0
   SUBI 0x0001                    #
-  SUB $tmp1                      # Se o mesmo for, n„o precisa remover da lista
+  SUB $tmp1                      # Se o mesmo for, n√£o precisa remover da lista
   BEQ END_REMOVE_TASK_FROM_LIST  #
   
    
   LDI 0x0                    # Carrega o valor 0
   STO $tmp2                  # Armazena em $tmp2
 LOOP_REBUILD_TASK_LIST:      #
-  LD $tmp2                   # Carrega o valor do Ìndice
-  SUB $tmp1                  # Verifica se o valor contido no Ìndice 
-  BEQ REMOVE_TASK_FROM_LIST  # È igual ao valo de $tmp1
-  LD $tmp2                   # Se n„o for igual, carrega $tmp2
+  LD $tmp2                   # Carrega o valor do √≠ndice
+  SUB $tmp1                  # Verifica se o valor contido no √≠ndice 
+  BEQ REMOVE_TASK_FROM_LIST  # √© igual ao valo de $tmp1
+  LD $tmp2                   # Se n√£o for igual, carrega $tmp2
   ADDI 0x1                   # e faz $tmp2 = $tmp2 + 1
   STO $tmp2                  #
   JMP LOOP_REBUILD_TASK_LIST # E volta para o loop
@@ -677,22 +689,22 @@ REMOVE_TASK_FROM_LIST:       # Se for igual,
   SUBI 0x0001                   #
   SUB $tmp2                     # Verifica se a quantidade de tarefas contidas na lista
   BLE END_REMOVE_TASK_FROM_LIST # Encerra a rotina se for igual
-  JMP REMOVE_TASK_FROM_LIST     # Sen„o, volta para o loop
+  JMP REMOVE_TASK_FROM_LIST     # Sen√£o, volta para o loop
 END_REMOVE_TASK_FROM_LIST:      #
   
   LD tsk_quantity           #
-  SUBI 0x0001               # Diminui o n˙mero de tarefas no sistema
+  SUBI 0x0001               # Diminui o n√∫mero de tarefas no sistema
   STO tsk_quantity          # 
   
   CALL BUBBLE_SORT          # Ordena a lista de tarefas
   
   LDI 0x0001                #
-  STO get_next_tsk          # Indica que a prÛxima tarefa pode ser chamada
+  STO get_next_tsk          # Indica que a pr√≥xima tarefa pode ser chamada
   
   LD tsk_quantity           #
   SUBI 0x0001               #
-  SUB current_tsk_ind       # Se o Ìndice atual for igual ‡ quantidade de tarefas
-  BNE RESET_TSK_IND         # reseta o Ìndice
+  SUB current_tsk_ind       # Se o √≠ndice atual for igual √† quantidade de tarefas
+  BNE RESET_TSK_IND         # reseta o √≠ndice
   
   LDI 0x0000                #
   STO current_tsk_ind       # 
@@ -700,16 +712,16 @@ END_REMOVE_TASK_FROM_LIST:      #
 RESET_TSK_IND:              #
   LD tsk_quantity           # Verifica se ainda existem tarefas para executar
   SUBI 0x0000               #
-  BEQ OS_END                # Se n„o existem mais, pula para o fim
+  BEQ OS_END                # Se n√£o existem mais, pula para o fim
   
-  JMP SCHEDULER             # Sen„o, pula para o SCHEDULER
+  JMP SCHEDULER             # Sen√£o, pula para o SCHEDULER
 
 
 #===============================================================================
 # SCHEDULER
 # 
-# Este scheduler È um simples round=robin, visto que a lista de 
-# tarefas est· sempre organizada.
+# Este scheduler √© um simples round=robin, visto que a lista de 
+# tarefas est√° sempre organizada.
 #===============================================================================
 SCHEDULER:
   LDI 0xFFE                 # Gera um bloqueio 
@@ -718,7 +730,7 @@ SCHEDULER:
   
   LD current_tsk_ind           #
   STO $indr                    #
-  LDV 0x05B0                   # Carrega o Ìndice da tarefa atual
+  LDV 0x05B0                   # Carrega o √≠ndice da tarefa atual
   ANDI 0x0007                  # 
   SLL 0x0004                   # 
   ADDI 0x0706                  # 
@@ -740,17 +752,17 @@ SCHEDULER:
   STO $arg1                    #
   CALL OS_TSK_PAUSE            # Pausa a tarefa
 
-  LD current_tsk_ind           # Carrega o Ìndice no qual est· a tarefa corrente
+  LD current_tsk_ind           # Carrega o √≠ndice no qual est√° a tarefa corrente
   ADDI 0x0001                  # Adiciona mais 1
   SUB tsk_quantity             # 
-  BEQ RESET_ROUND_ROBIN        # Se o indice da prÛxima tarefa for igual ‡ quantidade de tarefas
+  BEQ RESET_ROUND_ROBIN        # Se o indice da pr√≥xima tarefa for igual √† quantidade de tarefas
                                # reseta o round=robin
   
-  LD current_tsk_ind           # Carrega o Ìndice da tarefa atual
+  LD current_tsk_ind           # Carrega o √≠ndice da tarefa atual
   ADDI 0x1                     #
-  STO current_tsk_ind          # Atualiza para o prÛximo
+  STO current_tsk_ind          # Atualiza para o pr√≥ximo
   
-  JMP GOTO_TASK                # Sen„o, pula para a tarefa
+  JMP GOTO_TASK                # Sen√£o, pula para a tarefa
 
 RESET_ROUND_ROBIN:             #
   LDI 0x0000                   #
@@ -761,10 +773,10 @@ GOTO_TASK:
   SUBI 0x0000                  # Se a mesma for igual a zero
   BEQ OS_END                   # Encerra
   
-  LDI 0x0000                   # Desliga flag para pegar a prÛxima tarefa
+  LDI 0x0000                   # Desliga flag para pegar a pr√≥xima tarefa
   STO get_next_tsk             #
   
-  LD current_tsk_ind           # Carrega o Ìndice da tarefa
+  LD current_tsk_ind           # Carrega o √≠ndice da tarefa
   STO $indr                    #
   LDV 0x5B0                    #
   ANDI 0x000F                  # Carrega o id da tarefa
@@ -774,16 +786,16 @@ GOTO_TASK:
   
 #===============================================================================
 # OS_END
-# Encerra as operaÁıes do SO
+# Encerra as opera√ß√µes do SO
 #===============================================================================
 OS_END:                        # Encerra o SO
   HLT                          #
 
 #===============================================================================
-# Rotina de InterrupÁ„o
+# Rotina de Interrup√ß√£o
 #===============================================================================
 _INTERRUPT_:
-  LD current_tsk_ind        # Carrega o Ìndice atual da tarefa
+  LD current_tsk_ind        # Carrega o √≠ndice atual da tarefa
   ANDI 0x0007               #
   STO $arg1                 # Carrega o identificador da tarefa
   CALL OS_TSK_PAUSE         # Pausa a tarefa atual
@@ -792,32 +804,32 @@ _INTERRUPT_:
   # Interruption instructions here...
   #
   
-  JMP INTERRUPT_RETURN      # Retorna para o ponto de interrupÁ„o
+  JMP INTERRUPT_RETURN      # Retorna para o ponto de interrup√ß√£o
 #===============================================================================
 # MAIN
 #===============================================================================
 MAIN:
-  LDI 0x05A3                # EndereÁo onde ser· armazenado o valor do ˙ltimo PC
+  LDI 0x05A3                # Endere√ßo onde ser√° armazenado o valor do √∫ltimo PC
   STO lst_pc_value          #
-  LDI 0x05A2                # EndereÁo onde ser· armazenado o valor do ˙ltimo STATUS
+  LDI 0x05A2                # Endere√ßo onde ser√° armazenado o valor do √∫ltimo STATUS
   STO lst_status_value      #
-  LDI 0x05A1                # EndereÁo onde ser· armazenado o valor do ˙ltimo ACC
+  LDI 0x05A1                # Endere√ßo onde ser√° armazenado o valor do √∫ltimo ACC
   STO lst_acc_value         #
-  LDI 0x05A0                # EndereÁo onde ser· armazenado o valor do ˙ltimo INDR
+  LDI 0x05A0                # Endere√ßo onde ser√° armazenado o valor do √∫ltimo INDR
   STO lst_indr_value        # 
   LDI 0x0001                #
   STO $tmr0_config          # Configura o prescaller
   LDI 0x01FF                # 
   STO 0x0412                # Configura a fatia de tempo em 0x1FF (Para fins de teste)
   LDI 0x0000                # 
-  STO $int_config           # Desativa interrupÁıes
+  STO $int_config           # Desativa interrup√ß√µes
   
 #===============================================================================
-# Chamada aos Programas do Usu·rio
+# Chamada aos Programas do Usu√°rio
 #===============================================================================
-  LDI INIT_TSK_1            # EndereÁo do inÌcio da tarefa
+  LDI INIT_TSK_1            # Endere√ßo do in√≠cio da tarefa
   STO $arg1                 # registrador de argumento 1
-  LDI END_TSK_1             # EndereÁo do fim da tarefa
+  LDI END_TSK_1             # Endere√ßo do fim da tarefa
   STO $arg2                 # registrador de argumento 2
   LDI 0x0001                # Prioridade da tarefa 1
   STO $arg3                 #
@@ -844,35 +856,35 @@ MAIN:
   JMP SCHEDULER             #
 
 #===============================================================================
-#  Programas do usu·rio
-# ¿ partir deste ponto È que comeÁa a m·gica...
+#  Programas do usu√°rio
+# √Ä partir deste ponto √© que come√ßa a m√°gica...
 #===============================================================================
 
 #===============================================================================
 # Programa 1
 #===============================================================================
-F1_0:              # FunÁ„o que subtrai 2 do valor contido em 0x111
+F1_0:              # Fun√ß√£o que subtrai 2 do valor contido em 0x111
   LD 0x111         #
   SUBI 0x0002      #
   STO 0x0111       #
-  CALL F1_1        # E chama a funÁ„o F1_1
+  CALL F1_1        # E chama a fun√ß√£o F1_1
   RETURN           #
   
-F1_1:              # FunÁ„o que adiciona 1 ao valor de 0x111
+F1_1:              # Fun√ß√£o que adiciona 1 ao valor de 0x111
   LD 0x0111        #
   ADDI 0x0001      #
   STO 0x0111       #
-  CALL F1_2        # E chama a funÁ„o F1_2
+  CALL F1_2        # E chama a fun√ß√£o F1_2
   RETURN           #
  
-F1_2:              # FunÁ„o que subtrai 2 do valor contido em 0x111
+F1_2:              # Fun√ß√£o que subtrai 2 do valor contido em 0x111
   LD 0x0111        #
   SUBI 0x0002      #
   STO 0x0111       # E retorna
   RETURN           #
 
 # ==============================================================================
-INIT_TSK_1:        # InÌcio da tarefa 1
+INIT_TSK_1:        # In√≠cio da tarefa 1
   LDI 0x01FF       # Carrega 0x1FF
   STO 0x0111       # Armazena em 0x111
 L1:                #
@@ -881,9 +893,9 @@ L1:                #
   STO 0x111        # Armazena o resultado em 111
   LDI 0x111
   STO $port0_data
-  CALL F1_0        # Chama a funÁ„o F1_0
+  CALL F1_0        # Chama a fun√ß√£o F1_0
   LD 0x111         # Carrega o valor contido em 0x111
-  SUBI 0x0         # Verifica se o valor È igual a 0x0
+  SUBI 0x0         # Verifica se o valor √© igual a 0x0
   BNE L1           # Desvia se for diferente
   JMP OS_TSK_END   # Encerra a tarefa
 END_TSK_1:         #
@@ -891,7 +903,7 @@ END_TSK_1:         #
 #===============================================================================
 # Programa 2
 #===============================================================================
-INIT_TSK_2:        # InÌcio da tarefa 2
+INIT_TSK_2:        # In√≠cio da tarefa 2
   LDI 0x02FF       # Carrega o valor 0x2FF
   STO 0x222        # Armazena em 0x222
 L2:                #
@@ -901,7 +913,7 @@ L2:                #
   LDI 0x222
   STO $port0_data
   LD 0x222         # Carrega o valor contido em 0x222
-  SUBI 0x0         # Verifica se o mesmo est· igual a 0
+  SUBI 0x0         # Verifica se o mesmo est√° igual a 0
   BNE L2           # Desvia se estiver diferente
   JMP OS_TSK_END   # Encerra a tarefa
 END_TSK_2:         #
@@ -909,7 +921,7 @@ END_TSK_2:         #
 #===============================================================================
 # Programa 3
 #===============================================================================
-INIT_TSK_3:        # InÌcio da tarefa 3
+INIT_TSK_3:        # In√≠cio da tarefa 3
   LDI 0x00FF       # Carrega o valor 0xFF
   STO 0x333        # Armazena o valor em 0x333
 L3:                # 
@@ -919,7 +931,7 @@ L3:                #
   LDI 0x333
   STO $port0_data
   LD 0x333         # Carrega o valor contido em 0x333
-  SUBI 0x0         # Verifica se o mesmo È igual a 0x0
+  SUBI 0x0         # Verifica se o mesmo √© igual a 0x0
   BNE L3           # Desvia se for diferente
   JMP OS_TSK_END   # Encerra a tarefa
 END_TSK_3:         #
